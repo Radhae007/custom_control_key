@@ -1,0 +1,23 @@
+digraph G {
+node [shape=box];
+"base_footprint" [label="base_footprint"];
+"base_link" [label="base_link"];
+"castor_wheel" [label="castor_wheel"];
+"imu_link" [label="imu_link"];
+"left_wheel" [label="left_wheel"];
+"lidar_link" [label="lidar_link"];
+"right_wheel" [label="right_wheel"];
+node [shape=ellipse, color=blue, fontcolor=blue];
+"base_footprint" -> "base_footprint_joint" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"base_footprint_joint" -> "base_link"
+"base_link" -> "castor_joint" [label="xyz: 0.2 0 -0.05 \nrpy: 0 -0 0"]
+"castor_joint" -> "castor_wheel"
+"base_link" -> "imu_joint" [label="xyz: 0 0 0.06 \nrpy: 0 -0 0"]
+"imu_joint" -> "imu_link"
+"base_link" -> "left_wheel_joint" [label="xyz: -0.15 0.18 -0.05 \nrpy: -1.5707 0 0"]
+"left_wheel_joint" -> "left_wheel"
+"base_link" -> "lidar_joint" [label="xyz: 0.1 0 0.075 \nrpy: 0 -0 0"]
+"lidar_joint" -> "lidar_link"
+"base_link" -> "right_wheel_joint" [label="xyz: -0.15 -0.18 -0.05 \nrpy: 1.5707 -0 0"]
+"right_wheel_joint" -> "right_wheel"
+}

@@ -15,8 +15,10 @@ The avibot has a proper setup to run SLAM(Manual), Navigation in it. This is a 2
 ## Steps to run the bot
 
 ### Power the pi 
-- Run the below commands to ssh into the pi (ssid:avibot , password:avibot1234) 
+- Run the below commands to ssh into the pi (ssid:avibot , password:avibot1234)
+
 ``` ssh avibot@avibot.local``` -- It asks for password to ssh into it. [Pswd: avibot]
+
 Docker commands 
 ``` docker start avibot``` -- to run the container in avibot
 ``` docker exec -it avibot``` -- to enter inside the running container 

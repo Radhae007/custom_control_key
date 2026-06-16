@@ -27,71 +27,103 @@ Avibot is a 2-wheeled differential drive robot with a castor wheel in the front.
 
 ---
 
-## 🚀 Steps to Run the Bot
+## 🔁 Usual Procedure — Full Steps for Every New Terminal
 
-### 1. Power & SSH into the Pi
+> This section is referenced throughout the docs. Every time you open a **new terminal**, follow these 3 steps in order before running any `ros2` command.
 
-Connect to the `avibot` Wi-Fi network, then SSH into the Pi:
+---
 
-| Field    | Value          |
-|----------|----------------|
-| SSID     | `avibot`       |
-| Password | `avibot1234`   |
-| SSH User | `avibot`       |
-| SSH Pass | `avibot`       |
+### Step 1 — Connect to avibot Wi-Fi & SSH into the Pi
+
+Make sure your machine is connected to the **`avibot`** Wi-Fi network first.
+
+| Field    | Value        |
+|----------|--------------|
+| SSID     | `avibot`     |
+| Password | `avibot1234` |
+
+Then open a terminal and run:
 
 ```bash
 ssh avibot@avibot.local
 ```
 
-> You will be prompted for the SSH password: **`avibot`**
+Enter the SSH password when prompted:
+
+```
+avibot
+```
 
 ---
 
-### 2. Start the Docker Container
+### Step 2 — Enter the Docker Container
 
-Run the following commands to start and enter the container:
+The container should already be running (it was started in the very first terminal). So **skip** `docker start` and go straight to:
 
 ```bash
-# Start the container
-docker start avibot
-
-# Enter the running container
 docker exec -it avibot bash
 ```
 
+> **If the Pi was just rebooted** and the container isn't running yet, start it first:
+> ```bash
+> docker start avibot
+> docker exec -it avibot bash
+> ```
+
 ---
 
-### 3. Source ROS 2 Environment
+### Step 3 — Source the ROS 2 Environment
 
-Run these inside the container every time you open a new terminal session:
+Once inside the container, run both source commands:
 
 ```bash
 source /opt/ros/humble/setup.bash
+```
+
+```bash
 source install/setup.bash
 ```
 
+> ⚠️ You must do this **every time** you enter the container in a new terminal. The environment does not persist between sessions.
+
+| Command | What it does |
+|---|---|
+| `source /opt/ros/humble/setup.bash` | Loads the core ROS 2 Humble system — makes `ros2` available |
+| `source install/setup.bash` | Loads your workspace packages (`custom_control_key`, `ydlidar_ros2_driver`, etc.) |
+
+Skipping either one will cause `ros2` commands to fail with *"package not found"* errors.
+
 ---
 
-### 4. Micro ROS (Encoders)
+✅ **You're ready. Now run your `ros2` command for that terminal.**
+
+---
+
+## 🚀 Steps to Run the Bot
+
+> **First terminal only:** Start the Docker container with `docker start avibot` before `docker exec`. All subsequent terminals skip `docker start` — see [Usual Procedure](#-usual-procedure--full-steps-for-every-new-terminal).
+
+---
+
+### 1. Micro ROS (Encoders)
 
 1. Plug in the USB cable from the **ESP8266 connected to the Encoders** into the Pi.
-2. Run the Micro ROS agent:
+2. Open a terminal and follow the [Usual Procedure](#-usual-procedure--full-steps-for-every-new-terminal) *(this is the first terminal — run `docker start avibot` here)*.
+3. Run the Micro ROS agent:
 
 ```bash
 ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyUSB0
 ```
 
-3. Once the command is running, **press the RST button** on the ESP8266 to establish the connection.
+4. Once the command is running, **press the RST button** on the ESP8266 to establish the connection.
 
 ---
 
-### 5. LiDAR
+### 2. LiDAR
 
 1. Connect **both USB cables** (Power and Data) from the YDLidar T Mini Plus to the Pi.
-2. Open a **new terminal**, SSH into the Pi, and follow the [source commands](#3-source-ros-2-environment).
-
-> ⚠️ **Skip** `docker start avibot` — the container is already running from Step 2.
+2. Open a **new terminal** and follow the [Usual Procedure](#-usual-procedure--full-steps-for-every-new-terminal) *(skip `docker start` — container is already running)*.
+3. Run:
 
 ```bash
 ros2 launch ydlidar_ros2_driver ydlidar_launch.py
@@ -99,35 +131,41 @@ ros2 launch ydlidar_ros2_driver ydlidar_launch.py
 
 ---
 
-### 6. IMU
+### 3. IMU
 
 1. Plug in the USB cable from the **second ESP8266** (IMU) into the Pi.
-2. Open **3 new terminals**, SSH into the Pi in each, and follow the [source commands](#3-source-ros-2-environment) in all three.
-
-> ⚠️ **Skip** `docker start avibot` in all three — the container is already running.
+2. Open **3 new terminals** and follow the [Usual Procedure](#-usual-procedure--full-steps-for-every-new-terminal) in each *(skip `docker start` in all three)*.
 
 **Terminal 1** — IMU Node:
+
 ```bash
 ros2 run custom_control_key imu_node
 ```
 
 **Terminal 2** — Pose Integrator:
+
 ```bash
 cd src/custom_control_key/custom_control_key
+```
+```bash
 python3 pose_integrator.py
 ```
 
 **Terminal 3** — Velocity Fusion:
+
 ```bash
 cd src/custom_control_key/custom_control_key
+```
+```bash
 python3 velocity_fusion_node.py
 ```
 
 ---
 
-### 7. SLAM & Nav2
+### 4. SLAM & Nav2
 
-Open a new terminal, follow the [usual procedure](#3-source-ros-2-environment), then launch:
+1. Open a **new terminal** and follow the [Usual Procedure](#-usual-procedure--full-steps-for-every-new-terminal) *(skip `docker start`)*.
+2. Run:
 
 ```bash
 ros2 launch custom_control_key launch.py
@@ -135,9 +173,10 @@ ros2 launch custom_control_key launch.py
 
 ---
 
-### 8. Teleoperation (Movement Control)
+### 5. Teleoperation (Movement Control)
 
-Open a new terminal, follow the [usual procedure](#3-source-ros-2-environment), then run:
+1. Open a **new terminal** and follow the [Usual Procedure](#-usual-procedure--full-steps-for-every-new-terminal) *(skip `docker start`)*.
+2. Run:
 
 ```bash
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
@@ -149,20 +188,21 @@ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 
 ## 🗂️ Terminal Launch Order Summary
 
-| Step | What | Command |
-|------|------|---------|
-| 1 | Micro ROS (Encoders) | `ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyUSB0` |
-| 2 | LiDAR | `ros2 launch ydlidar_ros2_driver ydlidar_launch.py` |
-| 3 | IMU Node | `ros2 run custom_control_key imu_node` |
-| 4 | Pose Integrator | `python3 pose_integrator.py` |
-| 5 | Velocity Fusion | `python3 velocity_fusion_node.py` |
-| 6 | SLAM / Nav2 | `ros2 launch custom_control_key launch.py` |
-| 7 | Teleop | `ros2 run teleop_twist_keyboard teleop_twist_keyboard` |
+| Terminal # | Purpose | First: [Usual Procedure](#-usual-procedure--full-steps-for-every-new-terminal) | Then Run |
+|------------|---------|----------------|----------|
+| 1 | Micro ROS (Encoders) | ✅ + `docker start avibot` | `ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyUSB0` |
+| 2 | LiDAR | ✅ | `ros2 launch ydlidar_ros2_driver ydlidar_launch.py` |
+| 3 | IMU Node | ✅ | `ros2 run custom_control_key imu_node` |
+| 4 | Pose Integrator | ✅ | `cd src/custom_control_key/custom_control_key` → `python3 pose_integrator.py` |
+| 5 | Velocity Fusion | ✅ | `cd src/custom_control_key/custom_control_key` → `python3 velocity_fusion_node.py` |
+| 6 | SLAM / Nav2 | ✅ | `ros2 launch custom_control_key launch.py` |
+| 7 | Teleop | ✅ | `ros2 run teleop_twist_keyboard teleop_twist_keyboard` |
 
 ---
 
 ## 📝 Notes
 
-- Always source ROS 2 and the workspace in every new terminal before running any `ros2` command.
-- The Docker container only needs to be **started once** (`docker start avibot`). Subsequent terminals use `docker exec -it avibot bash`.
-- Make sure all USB devices are plugged in **before** running their respective ROS nodes.
+- `docker start avibot` only needs to be run **once** (Terminal 1). All other terminals use only `docker exec -it avibot bash`.
+- Always run **both** source commands inside the container for every new terminal session.
+- Plug in all USB devices **before** running their respective ROS nodes.
+- After running the Micro ROS agent, always **press RST** on the encoder ESP8266 to initialise the connection.
